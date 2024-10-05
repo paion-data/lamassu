@@ -1,0 +1,108 @@
+# Copyright Jiaqi Liu
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+---
+name: CI/CD
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+jobs:
+  yml-md-style-and-link-checks:
+    uses: QubitPi/hashistack/.github/workflows/yml-md-style-and-link-checks.yml@master
+
+  unit-tests:
+    needs: yml-md-style-and-link-checks
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10"]
+        test: [
+          {test-file: "mlflow/test_parser.py", requirements-file: "mlflow/requirements.txt"}
+        ]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: pip3 install -r ${{ matrix.test.requirements-file }}
+      - name: Run all tests
+        run: python3 -m unittest ${{ matrix.test.test-file }}
+
+  mlflow-tests:
+    needs: unit-tests
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10"]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Remove unnecessary files
+        run: .github/free_disk_space.sh
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: pip3 install -r requirements.txt
+        working-directory: mlflow
+      - name: Build model
+        run: python3 HanLPner.py
+        working-directory: mlflow
+      - name: Build Docker image
+        run: mlflow models build-docker --name "entity-extraction"
+        working-directory: mlflow
+      - name: Run Container
+        run: |
+          cp parser.py models/HanLPner/
+          export ML_MODEL_PATH=${{ github.workspace }}/mlflow/models/HanLPner
+          docker run --rm \
+            --memory=4000m \
+            -p 8080:8080 \
+            -v $ML_MODEL_PATH:/opt/ml/model \
+            -e PYTHONPATH="/opt/ml/model:$PYTHONPATH" \
+            -e GUNICORN_CMD_ARGS="--timeout 60 -k gevent --workers=1" \
+            "entity-extraction" &
+        working-directory: mlflow
+      - name: Wait until container is up
+        run: |
+          npm install -g wait-on
+          wait-on http://127.0.0.1:8080/ping
+      - name: Get status code of a test request and verify it's 200
+        run: |
+          status_code=$(curl -s -o /dev/null -w "%{http_code}" -X POST -H "Content-Type:application/json" --data '{"dataframe_split": {"columns":["text"], "data":[["我爱中国"], ["世界会变、科技会变，但「派昂」不会变，它不会向任何人低头，不会向任何困难低头，甚至不会向「时代」低头。「派昂」，永远引领对科技的热爱。只有那些不向梦想道路上的阻挠认输的人，才配得上与我们一起追逐梦想"]]}}' http://127.0.0.1:8080/invocations)
+          if [ "$status_code" == 200 ]; then
+            exit 0
+          else
+            echo "Integration test failed with a non-200 response from container"
+            exit 1
+          fi
+
+  sync-to-huggingface-space:
+    needs: unit-tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          lfs: true
+      - name: Push to hub
+        run: git push https://QubitPi:$HF_TOKEN@huggingface.co/spaces/QubitPi/lamassu master:main -f
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}

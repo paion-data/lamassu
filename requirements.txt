@@ -1,1 +1,1 @@
-numpy
+hanlp[amr,fasttext,full,tf]
