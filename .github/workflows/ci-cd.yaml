@@ -135,6 +135,6 @@ jobs:
           fetch-depth: 0
           lfs: true
       - name: Push to hub
-        run: git push https://QubitPi:$HF_TOKEN@huggingface.co/spaces/QubitPi/lamassu master:main -f
+        run: git push https://paion-data:$HF_TOKEN@huggingface.co/spaces/paion-data/lamassu master:main -f
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}

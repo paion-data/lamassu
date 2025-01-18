@@ -32,7 +32,7 @@ MLflow
 ### Getting Source Code
 
 ```console
-git clone git@github.com:QubitPi/lamassu.git
+git clone git@github.com:paion-data/lamassu.git
 ```
 
 ### Running Locally
@@ -99,14 +99,14 @@ The use and distribution terms for [lamassu]() are covered by the [Apache Licens
 [Apache License, Version 2.0]: https://www.apache.org/licenses/LICENSE-2.0
 
 [Hugging Face space badge]: https://img.shields.io/badge/Hugging%20Face%20Space-lamassu-FF9D00?style=for-the-badge&logo=huggingface&logoColor=white&labelColor=6B7280
-[Hugging Face space URL]: https://huggingface.co/spaces/QubitPi/lamassu
+[Hugging Face space URL]: https://huggingface.co/spaces/paion-data/lamassu
 
-[Hugging Face sync status badge]: https://img.shields.io/github/actions/workflow/status/QubitPi/lamassu/ci-cd.yaml?branch=master&style=for-the-badge&logo=github&logoColor=white&label=Hugging%20Face%20Sync%20Up
-[Hugging Face sync status URL]: https://github.com/QubitPi/lamassu/actions/workflows/ci-cd.yaml
+[Hugging Face sync status badge]: https://img.shields.io/github/actions/workflow/status/paion-data/lamassu/ci-cd.yaml?branch=master&style=for-the-badge&logo=github&logoColor=white&label=Hugging%20Face%20Sync%20Up
+[Hugging Face sync status URL]: https://github.com/paion-data/lamassu/actions/workflows/ci-cd.yaml
 
 [MLflow badge]: https://img.shields.io/badge/MLflow%20Supported-0194E2?style=for-the-badge&logo=mlflow&logoColor=white
-[MLflow URL]: https://mlflow.qubitpi.org/
-[MLflow build status badge]: https://img.shields.io/github/actions/workflow/status/QubitPi/lamassu/ci-cd.yaml?branch=master&style=for-the-badge&logo=github&logoColor=white&label=MLflow%20Build
-[MLflow build status URL]: https://github.com/QubitPi/lamassu/actions/workflows/ci-cd.yaml
+[MLflow URL]: https://mlflow.org/docs/latest/index.html
+[MLflow build status badge]: https://img.shields.io/github/actions/workflow/status/paion-data/lamassu/ci-cd.yaml?branch=master&style=for-the-badge&logo=github&logoColor=white&label=MLflow%20Build
+[MLflow build status URL]: https://github.com/paion-data/lamassu/actions/workflows/ci-cd.yaml
 
 [Python Version Badge]: https://img.shields.io/badge/Python-3.10-brightgreen?style=for-the-badge&logo=python&logoColor=white
